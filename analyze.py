@@ -1,24 +1,23 @@
 import numpy as np
 from gomill import sgf, sgf_moves
 
-path = "badukmovies-pro-collection/1626/11/YasuiSantetsu-NakamuraDoseki3.sgf"
-with open(path, "r") as myfile:
-  content = myfile.read()
+def load_game(sgf_path):
+  with open(sgf_path, "r") as myfile:
+    content = myfile.read()
 
-try:
-  my_game = sgf.Sgf_game.from_string(content)
-except ValueError:
-  raise StandardError("bad sgf file")
+  try:
+    my_game = sgf.Sgf_game.from_string(content)
+  except ValueError:
+    raise StandardError("bad sgf file")
 
-try:
-  board, plays = sgf_moves.get_setup_and_moves(my_game)
-except ValueError, e:
-  raise StandardError(str(e))
+  try:
+    board, plays = sgf_moves.get_setup_and_moves(my_game)
+  except ValueError, e:
+    raise StandardError(str(e))
 
-print enumerate(plays)
-print len(plays)
+  return board, plays
 
-def get_positions(move_numbers):
+def get_positions(board, plays, move_numbers):
   '''
   '''
   # aggregate board positions in here
@@ -39,8 +38,7 @@ def get_positions(move_numbers):
       raise StandardError("illegal move in sgf file")
 
     if move_number in move_numbers:
-      print board_to_numpy_arrays(board)
-      # positions.append(board_to_numpy_arrays(board))
+      positions.append(board_to_numpy_arrays(board))
 
   return positions
 
@@ -58,5 +56,6 @@ def board_to_numpy_arrays(board):
   position_black[coords_black] = 1
   return (position_black, position_white)
 
-get_positions([10])
-
+path = "badukmovies-pro-collection/1626/11/YasuiSantetsu-NakamuraDoseki3.sgf"
+board, plays = load_game(path)
+print get_positions(board, plays, [10])
