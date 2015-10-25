@@ -108,7 +108,7 @@ def pad_hist(counts, target_length):
 def examine_game():
     # Load boards at specified moves
     path = 'KGS2005/2005-01-01-5.sgf'
-    counts_list, moves = load_counts(path)
+    counts_list, moves = load_counts(path, 50, 50)
 
     # Figure out largest number of bins
     max_binlen = max([len(counts) for counts in counts_list])
@@ -154,13 +154,13 @@ def examine_game():
     # Draw the plot
     plt.show()
 
-def load_counts(path):
+def load_counts(path, first_check, move_step):
     '''
     Loads the group size counts for the specified game.
     
     '''
     board, plays = load_game(path)
-    moves = range(50, len(plays), 50)
+    moves = range(first_check, len(plays), move_step)
     b_boards, w_boards = zip(*get_positions(board, plays, moves))
 
     # Check group sizes at each move
@@ -171,10 +171,11 @@ def load_counts(path):
 
     return counts_list, moves
 
-'''
 def average_games():
-    counts_list = directory_map('KGS2005', lambda g: load_game(
-'''
+    # Get counts for each game in the directory
+    counts_list_list = directory_map('KGS2005', lambda p: load_counts(p, 50, 50)[0])
+
+    max_binlen = max([len(counts) for counts in counts_list_list])
 
 ##################################################
 
