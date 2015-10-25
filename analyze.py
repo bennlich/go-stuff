@@ -79,9 +79,17 @@ def directory_map(dir, fn):
 ##################################################
 
 if __name__ == '__main__':
+    # Histogram game lengths
+    game_lengths = directory_map("badukmovies-pro-collection", lambda x: len(load_game(x)[1]))
 
-    directory_map("badukmovies-pro-collection", lambda x: x)
+    fig = plt.figure()
+    ax = fig.add_subplot(1, 1, 1)
+    ax.hist(game_lengths, 35)
+    plt.show()
+    
     print 'done'
+
+    # Plot game lengths
 
     # # Load boards at specified move
     # path = "badukmovies-pro-collection/1626/11/YasuiSantetsu-NakamuraDoseki3.sgf"
@@ -105,6 +113,8 @@ if __name__ == '__main__':
     # ax.set_ylabel('Counts')
     # ax.set_ylim(-0.5, max(combined_counts) + 1)
     # plt.legend(loc='upper right')
+
+
 
     # plt.show()
 
