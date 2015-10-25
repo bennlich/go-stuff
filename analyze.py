@@ -60,6 +60,11 @@ def load_counts(path, first_check, move_step):
     '''
     board, plays = load_game(path)
     moves = range(first_check, len(plays), move_step)
+
+    if len(moves) is 0:
+        print "UhOh-- %s has %s plays" % (path, len(plays))
+        return [np.zeros(1)], []
+
     b_boards, w_boards = zip(*get_positions(board, plays, moves))
 
     # Check group sizes at each move
