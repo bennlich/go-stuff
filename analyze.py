@@ -1,5 +1,9 @@
+#!/usr/bin/env python
+
 import numpy as np
+import matplotlib.pyplot as plt
 from gomill import sgf, sgf_moves
+import group_finder
 
 def load_game(sgf_path):
   with open(sgf_path, "r") as myfile:
@@ -54,8 +58,33 @@ def board_to_numpy_arrays(board):
   position_black = np.zeros([19, 19])
   position_white[coords_white] = 1
   position_black[coords_black] = 1
-  return (position_black, position_white)
+  return position_black, position_white
 
-path = "badukmovies-pro-collection/1626/11/YasuiSantetsu-NakamuraDoseki3.sgf"
-board, plays = load_game(path)
-print get_positions(board, plays, [10])
+##################################################
+
+if __name__ == '__main__':
+    # Load boards at specified move
+    path = "badukmovies-pro-collection/1626/11/YasuiSantetsu-NakamuraDoseki3.sgf"
+    board, plays = load_game(path)
+    b_board, w_board = get_positions(board, plays, [100])[0]
+
+    # Check group sizes
+    b_bins, b_counts = group_finder.get_group_hists(b_board)
+    w_bins, w_counts = group_finder.get_group_hists(w_board)
+    combined_bins, combined_counts = group_finder.combine_hists(b_bins, b_counts, w_bins, w_counts)
+
+    # Plot group size histogram
+    fig = plt.figure()
+    ax = fig.add_subplot(1, 1, 1)
+
+    ax.scatter(b_bins, b_counts, color = 'black', label = 'Black')
+    ax.scatter(w_bins, w_counts, facecolors = 'none', label = 'White')
+    ax.scatter(combined_bins, combined_counts, color = 'gray', label = 'Combined')
+
+    ax.set_xlabel('Group sizes')
+    ax.set_ylabel('Counts')
+    ax.set_ylim(-0.5, max(combined_counts) + 1)
+    plt.legend(loc='upper right')
+
+    plt.show()
+
