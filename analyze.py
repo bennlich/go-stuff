@@ -119,10 +119,11 @@ def plot_gamecube(average_over_games, error_over_games, samples):
     # Plot group size histogram
     for i in range(num_samples):
         counts = average_over_games[i, :]
+        errors = error_over_games[i, :]
         # Can infer the correct bins by looking at the length of counts
         group_sizes = np.arange(1, len(counts) + 1) + width * i - 0.5 + width / 2
 
-        ax.bar(group_sizes, counts, width, color = cmap(i / float(num_samples)), \
+        ax.bar(group_sizes, counts, width, color = cmap(i / float(num_samples)), yerr = errors, \
                 label = str(samples[i]) + ' moves')
 
     # Make the plot pretty
