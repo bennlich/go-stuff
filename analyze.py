@@ -14,8 +14,6 @@ def examine_game():
 
     # Figure out largest number of bins
     max_binlen = max([len(counts) for counts in counts_list])
-    # Pad counts
-    counts_list = [pad_hist(counts, max_binlen) for counts in counts_list]
 
     fig = plt.figure()
     ax = fig.add_subplot(1, 1, 1)
@@ -26,15 +24,15 @@ def examine_game():
     cmap = plt.get_cmap('jet')
     #cmap = lambda r: (1, 0, 0, r)
 
-    all_bins = np.arange(1, max_binlen + 1)   # the x locations for the groups
     width = 1.0 / (len(moves) + 1.0)      # the width of the bars
     rects = []
 
     # Plot group size histogram
     for i in range(len(moves)):
         counts = counts_list[i]
-        ax.bar(all_bins + width * i - 0.5 + width / 2, counts, width, color = cmap(i / float(len(moves))), \
-                label = str(moves[i]) + ' moves')
+        # Can infer the correct bins by looking at the length of counts
+        ax.bar(np.arange(1, len(counts) + 1) + width * i - 0.5 + width / 2, counts, width, \
+                color = cmap(i / float(len(moves))), label = str(moves[i]) + ' moves')
 
         # Keep track of largest group frequency over the set of moves
         max_counts = max(max_counts, max(counts))
