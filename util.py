@@ -16,11 +16,5 @@ def directory_map(dir, fn):
 
     return results
 
-def pad_hist(counts, target_length):
-    '''
-    Pad *counts* with 0s so its length becomes target_length.
 
-    '''
-    new_counts = np.zeros(target_length)
-    new_counts[:counts.size] = counts
-    return new_counts
+
