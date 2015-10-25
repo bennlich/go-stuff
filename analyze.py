@@ -3,7 +3,7 @@
 import os
 import numpy as np
 import matplotlib.pyplot as plt
-from matplotlib.ticker import MultipleLocator
+from matplotlib.ticker import FixedLocator, MultipleLocator
 from gomill import sgf, sgf_moves
 import group_finder
 
@@ -100,6 +100,7 @@ def examine_game():
     max_counts = 0
     # Sexy colors
     cmap = plt.get_cmap('jet')
+    #cmap = lambda r: (1, 0, 0, r)
 
     all_bins = np.arange(1, max_binlen + 1)   # the x locations for the groups
     width = 1.0 / (len(moves) + 1.0)      # the width of the bars
@@ -108,29 +109,27 @@ def examine_game():
     # Plot group size histogram
     for i in range(len(moves)):
         counts = counts_list[i]
-        ax.bar(all_bins + width * i - 0.5, counts, width, color=cmap(i / float(len(moves))), \
+        ax.bar(all_bins + width * i - 0.5 + width / 2, counts, width, color = cmap(i / float(len(moves))), \
                 label = str(moves[i]) + ' moves')
 
-        # Keep track of highest bin count
+        # Keep track of largest group frequency over the set of moves
         max_counts = max(max_counts, max(counts))
-        #rects.append(new_rect)
-        #bins = bins_list[i]
-        #counts = counts_list[i]
-        # Make the colors pretty
-        #ratio = i / float(len(moves))
-        #ax.plot(bins, counts, '-', color = cmap(ratio), label = str(moves[i]) + ' moves', linewidth = 2)
 
     # Make the plot pretty
     ax.set_xlabel('Group sizes')
     ax.set_ylabel('Counts')
     ax.set_ylim(0.0, max_counts + 1)
+    ax.set_xlim(0.5, max_binlen + 1)
     plt.legend(loc='upper right')
 
-    # Set major ticks
-    majorLocator = MultipleLocator(1)
-    ax.xaxis.set_major_locator(majorLocator)
-    ax.set_xlim(0.5, max_binlen + 1)
+    # Set ticks to appear between bins and to label x positions of bins
+    major_locator = MultipleLocator(1)
+    ax.xaxis.set_major_locator(major_locator)
+    plt.tick_params(which='major', length = 0)
+    minor_locator = FixedLocator(np.arange(0.5, max_binlen + 1.5, 1.0))
+    ax.xaxis.set_minor_locator(minor_locator)
 
+    # Draw the plot
     plt.show()
 
 def load_counts(path):
@@ -167,8 +166,8 @@ if __name__ == '__main__':
 
     ##############################################
 
-    #examine_game()
+    examine_game()
 
-    average_games()
+    #average_games()
 
 
