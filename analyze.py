@@ -33,7 +33,7 @@ def get_positions(board, plays, move_numbers):
   for move_number, play in enumerate(relevant_plays):
     colour, move = play
     if move is None:
-        continue
+      continue
     row, col = move
 
     try:
