@@ -25,25 +25,33 @@ def load_game(sgf_path):
 
 def get_positions(board, plays, move_numbers):
     '''
+    Given a gomill board, a list of plays, and a list of move numbers,
+    returns a list of tuples of board configurations at the
+    specified move_numbers.
+
+    E.g. returns [(b1, w1), (b2, w2), ...], where b# and w#
+    are 19x19 numpy arrays with 1s where the black and white
+    pieces are respectively.
+
     '''
-    # aggregate board positions in here
+    # aggregate board positions to this list
     positions = []
     # only iterate through plays up to
-    # the latest move we're interested in
+    # the last move we're interested in
     last_move = np.amax(move_numbers)
     relevant_plays = plays[:last_move+1]
     for move_number, play in enumerate(relevant_plays):
         colour, move = play
-
-        # Only make a move if it's not a pass
+        # only make a move if it's not a pass
         if move is not None:
             row, col = move
-
             try:
                 board.play(row, col, colour)
             except ValueError:
                 raise StandardError("illegal move in sgf file")
 
+        # if we've reached a move we're interested in,
+        # save the current board position
         if move_number in move_numbers:
             positions.append(board_to_numpy_arrays(board))
 
@@ -51,6 +59,9 @@ def get_positions(board, plays, move_numbers):
 
 def board_to_numpy_arrays(board):
     '''
+    Given a 19x19 gomill board, returns a tuple of 19x19 numpy 
+    arrays with 1s where the black and white pieces are respectively.
+
     '''
     points = board.list_occupied_points()
     plays_white = [ point[1] for point in points if point[0] is 'w' ]
@@ -79,6 +90,10 @@ def directory_map(dir, fn):
     return results
 
 def pad_hist(counts, target_length):
+    '''
+    Pad *counts* with 0s so its length becomes target_length.
+
+    '''
     new_counts = np.zeros(target_length)
     new_counts[:counts.size] = counts
     return new_counts
@@ -136,6 +151,7 @@ def examine_game():
 def load_counts(path):
     '''
     Loads the group size counts for the specified game.
+    
     '''
     board, plays = load_game(path)
     moves = range(50, len(plays), 50)
