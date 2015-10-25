@@ -13,7 +13,7 @@ def examine_game():
     counts_list, moves = load_counts(path, 50, 50)
 
     # Figure out largest number of bins
-    max_binlen = max([len(counts) for counts in counts_list])
+    max_num_groups = max([len(counts) for counts in counts_list])
 
     fig = plt.figure()
     ax = fig.add_subplot(1, 1, 1)
@@ -40,14 +40,14 @@ def examine_game():
     ax.set_xlabel('Group sizes')
     ax.set_ylabel('Counts')
     ax.set_ylim(0.0, max_counts + 1)
-    ax.set_xlim(0.5, max_binlen + 1)
+    ax.set_xlim(0.5, max_num_groups + 1)
     plt.legend(loc='upper right')
 
     # Set ticks to appear between bins and to label x positions of bins
     major_locator = MultipleLocator(1)
     ax.xaxis.set_major_locator(major_locator)
     plt.tick_params(which='major', length = 0)
-    minor_locator = FixedLocator(np.arange(0.5, max_binlen + 1.5, 1.0))
+    minor_locator = FixedLocator(np.arange(0.5, max_num_groups + 1.5, 1.0))
     ax.xaxis.set_minor_locator(minor_locator)
 
     # Draw the plot
