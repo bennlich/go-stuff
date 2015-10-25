@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 from matplotlib.ticker import FixedLocator, MultipleLocator
 import group_finder
 from parse import load_game, get_positions
-from util import pad_hist, directory_map
+from util import directory_map
 
 def examine_game():
     # Load boards at specified moves
@@ -25,7 +25,6 @@ def examine_game():
     #cmap = lambda r: (1, 0, 0, r)
 
     width = 1.0 / (len(moves) + 1.0)      # the width of the bars
-    rects = []
 
     # Plot group size histogram
     for i in range(len(moves)):
