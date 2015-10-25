@@ -58,6 +58,7 @@ def load_counts(path, first_check, move_step):
     Loads the group size counts for the specified game.
     
     '''
+    print "parsing %s" % path
     board, plays = load_game(path)
     moves = range(first_check, len(plays), move_step)
 
