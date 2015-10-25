@@ -66,13 +66,20 @@ def board_to_numpy_arrays(board):
     points = board.list_occupied_points()
     plays_white = [ point[1] for point in points if point[0] is 'w' ]
     plays_black = [ point[1] for point in points if point[0] is 'b' ]
-    coords_white = zip(*plays_white)
-    coords_black = zip(*plays_black)
-    position_white = np.zeros([19, 19])
-    position_black = np.zeros([19, 19])
-    position_white[coords_white] = 1
-    position_black[coords_black] = 1
+    position_black = plays_to_numpy_array(plays_black)
+    position_white = plays_to_numpy_array(plays_white)
     return position_black, position_white
+
+def plays_to_numpy_array(points):
+    '''
+    Given a list of points, returns a 19x19 numpy array
+    with 1s at all the points and 0s everywhere else.
+
+    '''
+    coords = zip(*points)
+    board_array = np.zeros([19, 19])
+    board_array[coords] = 1
+    return board_array
 
 def directory_map(dir, fn):
     '''
