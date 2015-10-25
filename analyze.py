@@ -3,6 +3,7 @@
 import os
 import numpy as np
 import matplotlib.pyplot as plt
+from matplotlib.ticker import MultipleLocator
 from gomill import sgf, sgf_moves
 import group_finder
 
@@ -33,14 +34,15 @@ def get_positions(board, plays, move_numbers):
     relevant_plays = plays[:last_move+1]
     for move_number, play in enumerate(relevant_plays):
         colour, move = play
-        if move is None:
-            continue
-        row, col = move
 
-        try:
-            board.play(row, col, colour)
-        except ValueError:
-            raise StandardError("illegal move in sgf file")
+        # Only make a move if it's not a pass
+        if move is not None:
+            row, col = move
+
+            try:
+                board.play(row, col, colour)
+            except ValueError:
+                raise StandardError("illegal move in sgf file")
 
         if move_number in move_numbers:
             positions.append(board_to_numpy_arrays(board))
@@ -76,45 +78,97 @@ def directory_map(dir, fn):
 
     return results
 
+def pad_hist(counts, target_length):
+    new_counts = np.zeros(target_length)
+    new_counts[:counts.size] = counts
+    return new_counts
+
+def examine_game():
+    # Load boards at specified moves
+    path = 'KGS2005/2005-01-01-5.sgf'
+    counts_list, moves = load_counts(path)
+
+    # Figure out largest number of bins
+    max_binlen = max([len(counts) for counts in counts_list])
+    # Pad counts
+    counts_list = [pad_hist(counts, max_binlen) for counts in counts_list]
+
+    fig = plt.figure()
+    ax = fig.add_subplot(1, 1, 1)
+
+    # Keep track of highest group bin count
+    max_counts = 0
+    # Sexy colors
+    cmap = plt.get_cmap('jet')
+
+    all_bins = np.arange(1, max_binlen + 1)   # the x locations for the groups
+    width = 1.0 / (len(moves) + 1.0)      # the width of the bars
+    rects = []
+
+    # Plot group size histogram
+    for i in range(len(moves)):
+        counts = counts_list[i]
+        ax.bar(all_bins + width * i - 0.5, counts, width, color=cmap(i / float(len(moves))), \
+                label = str(moves[i]) + ' moves')
+
+        # Keep track of highest bin count
+        max_counts = max(max_counts, max(counts))
+        #rects.append(new_rect)
+        #bins = bins_list[i]
+        #counts = counts_list[i]
+        # Make the colors pretty
+        #ratio = i / float(len(moves))
+        #ax.plot(bins, counts, '-', color = cmap(ratio), label = str(moves[i]) + ' moves', linewidth = 2)
+
+    # Make the plot pretty
+    ax.set_xlabel('Group sizes')
+    ax.set_ylabel('Counts')
+    ax.set_ylim(0.0, max_counts + 1)
+    plt.legend(loc='upper right')
+
+    # Set major ticks
+    majorLocator = MultipleLocator(1)
+    ax.xaxis.set_major_locator(majorLocator)
+    ax.set_xlim(0.5, max_binlen + 1)
+
+    plt.show()
+
+def load_counts(path):
+    '''
+    Loads the group size counts for the specified game.
+    '''
+    board, plays = load_game(path)
+    moves = range(50, len(plays), 50)
+    b_boards, w_boards = zip(*get_positions(board, plays, moves))
+
+    # Check group sizes at each move
+    b_bins, b_counts = zip(*[group_finder.get_group_hists(bb) for bb in b_boards])
+    w_bins, w_counts = zip(*[group_finder.get_group_hists(wb) for wb in w_boards])
+    bins_list, counts_list = zip(*[group_finder.combine_hists(bbs, bcs, wbs, wcs) \
+            for bbs, bcs, wbs, wcs in zip(b_bins, b_counts, w_bins, w_counts)])
+
+    return counts_list, moves
+
+'''
+def average_games():
+    counts_list = directory_map('KGS2005', lambda g: load_game(
+'''
+
 ##################################################
 
 if __name__ == '__main__':
     # Histogram game lengths
-    game_lengths = directory_map("badukmovies-pro-collection", lambda x: len(load_game(x)[1]))
+    #game_lengths = directory_map("KGS2005", lambda x: len(load_game(x)[1]))
+    #
+    #fig = plt.figure()
+    #ax = fig.add_subplot(1, 1, 1)
+    #ax.hist(game_lengths, 35)
+    #plt.show()
 
-    fig = plt.figure()
-    ax = fig.add_subplot(1, 1, 1)
-    ax.hist(game_lengths, 35)
-    plt.show()
-    
-    print 'done'
+    ##############################################
 
-    # Plot game lengths
+    #examine_game()
 
-    # # Load boards at specified move
-    # path = "badukmovies-pro-collection/1626/11/YasuiSantetsu-NakamuraDoseki3.sgf"
-    # board, plays = load_game(path)
-    # b_board, w_board = get_positions(board, plays, [100])[0]
+    average_games()
 
-    # # Check group sizes
-    # b_bins, b_counts = group_finder.get_group_hists(b_board)
-    # w_bins, w_counts = group_finder.get_group_hists(w_board)
-    # combined_bins, combined_counts = group_finder.combine_hists(b_bins, b_counts, w_bins, w_counts)
-
-    # # Plot group size histogram
-    # fig = plt.figure()
-    # ax = fig.add_subplot(1, 1, 1)
-
-    # ax.scatter(b_bins, b_counts, color = 'black', label = 'Black')
-    # ax.scatter(w_bins, w_counts, facecolors = 'none', label = 'White')
-    # ax.scatter(combined_bins, combined_counts, color = 'gray', label = 'Combined')
-
-    # ax.set_xlabel('Group sizes')
-    # ax.set_ylabel('Counts')
-    # ax.set_ylim(-0.5, max(combined_counts) + 1)
-    # plt.legend(loc='upper right')
-
-
-
-    # plt.show()
 
